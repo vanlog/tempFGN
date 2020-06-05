@@ -1,0 +1,1073 @@
+---
+title: "Online Resource 01 - Supplementary appendices"
+author: "John Dagsvik, Mariachiara Fortuna, Sigmund H. Moen"
+subtitle: "How does the temperature vary over time? Evidence on the Stationary and Fractal nature of Temperature Fluctuations"
+output:
+  pdf_document: default
+
+---
+
+
+\vspace{8.5cm}
+
+**Affiliations:** 
+
+John K. Dagsvik, Statistics Norway, Research Department; 
+
+Mariachiara Fortuna, freelance statistician, Turin; 
+
+Sigmund Hov Moen, Westerdals Oslo School of Arts, Communication and Technology. 
+
+
+\vspace{0.5cm}
+
+**Corresponding author:**
+
+John K. Dagsvik, E-mail: john.dagsvik@ssb.no
+
+Mariachiara Fortuna, E-mail: mariachiara.fortuna1@gmail.com (reference for code and analysis)
+
+
+\newpage
+
+
+```{r global options, echo=F}
+knitr::opts_chunk$set(
+  echo = FALSE, # Set to TRUE for pdf with code
+  message=FALSE,
+  warning = FALSE)
+longrun <- FALSE
+```
+
+
+
+```{r loading libraries, warning = F, message = F}
+# require(tempFGN)
+require(knitr)
+require(dplyr)
+require(ggplot2)
+require(tidyr)
+require(tempFGN)
+
+```
+
+
+```{r path building, hide=T}
+# DATA PATH
+data_final_path <- file.path("data","final")
+data_supporting_path <- file.path("data", "supporting")
+data_moberg_path <- file.path("data", "moberg")
+
+# OUTPUT PATH
+output_supporting_path <- file.path("output", "supporting")
+output_table_path <- file.path("output", "table")
+output_figure_path <- file.path("output", "figure")
+output_temporary_path <- file.path("output", "temporary")
+output_manipuated_path <- file.path("output", "manipulated")
+```
+
+
+```{r data reading}
+
+# ACCESS TO SELECTED TIME SERIES
+selected <- read.csv(file.path(data_supporting_path, "T0.SelInfo.csv"), sep=";", dec=",")
+country_sel <- selected$Country
+station_sel <- selected$Station
+njs <- nrow(selected)
+data_dir_sel <- file.path(data_final_path, country_sel, paste0(station_sel, ".txt"))
+stationame_sel <- paste0(country_sel,", ",station_sel)
+
+# ACCESS TO ALL THE TIME SERIES
+all <- read.csv(file.path(data_supporting_path, "T0.TempInfo.csv"), sep=";", dec=",")
+country_all <- all$Country
+station_all <- all$Station
+nja <- nrow(all)
+data_dir_all <- file.path(data_final_path, country_all, paste0(station_all, ".txt"))
+stationame_all <- paste0(country_all,", ",station_all)
+
+# ACCESS TO MOBERG DATA
+moberg <- read.table(file.path(data_moberg_path, "Moberg data.txt"),
+                   header = T, na.strings = 99)
+Year_m <- moberg[, 1]
+Xj_m <- moberg[, 2]
+Zj_m <- scale(Xj_m)
+Yj_m <- cumsum(Zj_m)
+```
+  
+\newpage  
+
+# APPENDIX B - SUMMARY DATA INFORMATION
+
+## Figure B1. Plots of temperature series for 9 selected cities
+
+```{r FB1. Selected Temperature plot for pdf saving, eval=FALSE}
+
+pdf(file.path(output_figure_path, "FB1_selected_temperature_plot.pdf"),
+     paper="a4", width=7, height=10)
+par(mfrow=c(3,1))
+for (j in 1:njs){ 
+        data <- read.delim(data_dir_sel[j], header=F, na.strings=99)
+        Xj <- data[,14]
+        Year <- data[,1]
+        temperaturePlot(Xj=Xj, Year=Year, break.val=1960,
+                        main=paste("Temperature time series for",
+                                   stationame_sel[j]), cex.axis=1.2,
+                        cex.lab=1.2, cex.main=1.4)
+        }
+dev.off()
+```
+
+
+```{r, out.width = "90%"}
+include_graphics(file.path(output_manipuated_path, "FB1_selected_temperature_plot",
+                           "p01.pdf"))
+```
+
+```{r, out.width = "90%"}
+include_graphics(file.path(output_manipuated_path, "FB1_selected_temperature_plot",
+                           "p02.pdf"))
+```
+
+```{r,  out.width = "90%"}
+include_graphics(file.path(output_manipuated_path, "FB1_selected_temperature_plot",
+                           "p03.pdf"))
+```
+
+\pagebreak
+
+##  Table B1. Summary information about data
+
+```{r TB1. All info table building, eval = F}
+all_info <- NULL
+for (j in 1:nja){ 
+    data <- read.delim(data_dir_all[j], header=F, na.strings=99)
+    dataM <- monthlyAdj(data, scale = T) 
+    # Compute information for a given station
+    station_info <- dataM %>%
+    summarize(Station = stationame_all[j],
+            First_Year = min(year(Time)),
+            Last_Year  = max(year(Time)),
+            Years = Last_Year-First_Year+1,
+            Nonmiss_Months = n(),
+            Full_Lenght = 12*Years + month(max(Time)) - month(min(Time)),
+            Missing_Months = Full_Lenght - Nonmiss_Months # Check it
+            )
+# Create the information data.frame
+    all_info <- rbind(all_info, station_info)
+}
+
+# Write table
+write.csv(all_info, file.path(output_table_path, "TB1_all_info_table.csv"), row.names=F)
+```
+
+```{r TB1. All info table reading}
+TB1.allInfo <- read.csv(file.path(output_table_path, "TB1_all_info_table.csv"))%>%
+  select(-Full_Lenght)
+kable(TB1.allInfo,  digits=3, align='c',
+      col.names = c(" Weather station", "First year", "Last year", "Years",
+                    "Nonmissing months", "Missing months"))
+```
+
+\pagebreak
+  
+# APPENDIX C - ESTIMATION AND TEST RESULTS
+
+\pagebreak
+
+
+##  Table C1. Estimation results when using the characteristic function estimator and the Whittle method. Monthly data. 
+
+
+```{r TC1 - H estimation with full monthly data building, eval=FALSE}
+
+  # Parameters table
+  Parameters <- matrix(0, nrow=nja, ncol=3)
+  colnames(Parameters) <- c("Hc", "Hw", "SE_Hw")
+  rownames(Parameters) <- stationame_all
+  
+  pb <- txtProgressBar() # Start the progress bar
+
+  for (j in 1:nja){
+    
+    setTxtProgressBar(pb, j/nja) # Update the progress bar
+    
+    # Data reading 
+    data <- read.delim(data_dir_all[j], header=F, na.strings=99)
+    Zm <- monthlyAdj(data, scale=T)$Zm
+    
+    # Estimation
+    whittle <- WhittleEst(Zm)
+    Parameters[j,1] <- estim.cf.H(Yj=Zm, FBM=F)
+    Parameters[j,2] <- whittle$coefficients[1]
+    Parameters[j,3] <- whittle$coefficients[2]
+  }
+  close(pb) # close the progress bar
+  
+  # Saving data to csv
+  Parameters <- as.data.frame(Parameters)
+  write.csv(Parameters, file.path(output_table_path, 
+                                "TC1_monthly_H_all.csv"))
+
+```
+
+```{r TC1 - H estimation with full monthly data printing}
+
+TC1.monthlyHAll <- read.csv(file.path(output_table_path, "TC1_monthly_H_all.csv"))
+kable(TC1.monthlyHAll, digits=3, align='c', escape = F,
+      col.names = c(" Weather station", "$H_c$", "$H_w$", "$SE(H_w)$"))
+```
+
+Due to the fact that the monthly time series are quite long the estimates of the Hurst parameter are quite precise. From Table C1 we note that the difference between the characteristic function estimates and the Whittle estimates of the Hurst parameter are only significantly different in a few cases.
+
+
+
+## Table C2. Estimates and test statistics based on annual data
+
+```{r TC2. Annual Chi square test building, eval=FALSE}
+
+Q_Hc <- NULL
+Q_Hw <- NULL
+Hc_vec <- NULL
+Hw_vec <- NULL
+Hw_se_vec <- NULL
+for (j in 1:nja){ 
+  data <- read.delim(data_dir_all[j], header=F, na.strings=99)
+  Xj <- data[,14]
+  Zj <- scale(Xj[!is.na(Xj)])
+  TT <- length(Zj)
+  whittle <- WhittleEst(Zj)
+  Hc <- estim.cf.H(Yj=Zj, FBM=F)
+  Hw <- whittle$coefficients[1]
+  Hw_se <- whittle$coefficients[2]
+  Q_Hc <- c(Qstat(Zj, H=Hc, TT=TT), Q_Hc)
+  Q_Hw <- c(Qstat(Zj, H=Hw, TT=TT), Q_Hw)
+  Hc_vec <- c(Hc_vec, Hc)
+  Hw_vec <- c(Hw_vec, Hw)
+  Hw_se_vec <- c(Hw_se_vec, Hw_se)
+}
+
+#star <- ifelse(Q>1.96|Q<(-1.96), "*", "")
+annual_Qt_all <- data.frame(City=stationame_all, Hc=Hc_vec, Q_Hc=Q_Hc, 
+                             Hw=Hw_vec, Hw_se=Hw_se_vec, Q_Hw=Q_Hw)
+                            
+write.csv(annual_Qt_all, file.path(output_table_path, 
+                                "TC2_annual_Qt_all.csv"), row.names=F)
+
+```
+
+```{r TC2. Annual Chi square test reading}
+
+TC2.annualQtAll <- read.csv(file.path(output_table_path, 
+                                      "TC2_annual_Qt_all.csv"))
+kable(TC2.annualQtAll, digits=3, align='c', escape = F,
+      col.names = c(" Weather station", "$H_c$", "$Q(H_c)$", 
+                    "$H_w$", "$SE(H_w)$", "$Q(H_w)$"))
+```
+
+From the results in Table C2 we note that the estimates of the Hurst parameter based on annual data are, on average, higher than the corresponding estimates based on monthly data. Furthermore, we see that data from 9 weather stations reject the FGN hypothesis when using the characteristic function estimate of the Hurst parameter whereas data from 6 weather stations reject the FGN when using the Whittle estimate of the Hurst parameter.
+
+
+## Table C3. Estimates and test statistics based on Moberg et al. (2005) time series
+
+```{r NM. Moberg estimates, eval = F}
+TT <- length(Xj_m)
+mu <- mean(Xj_m)
+sd <- sd(Xj_m)
+mu_c <- estim.cf.mu(Zj=Xj_m)
+sigma_c <- estim.cf.sigma(Yj=Xj_m, FBM=F)
+Hc <- estim.cf.H(Yj=Zj_m, FBM=F)
+Hw <- estim.w.H(Zj_m)
+Hw_SE <- WhittleEst(Zj_m)$coefficient[2]
+Q.Hc <- Qstat(Zj_m, H=Hc, TT=TT)
+Q.Hw <- Qstat(Zj_m, H=Hw, TT=TT)
+
+
+moberg_estimates <- data.frame(c(mu, sd, mu_c, sigma_c, Hc, Hw, Hw_SE, Q.Hc, Q.Hw))
+rownames(moberg_estimates) <- c("Mu", "Sigma", "Mu_c", "Sigma_c",
+                                 "Hc", "Hw", "Hw_SE", "Q.Hc", "Q.Hw")
+colnames(moberg_estimates) <- "Estimates"
+
+Hc <- estim.cf.H(Yj=Zj_m, FBM=F)
+Hw <- estim.w.H(Zj_m)
+Hw_SE <- WhittleEst(Zj_m)$coefficient[2]
+Q.Hc <- Qstat(Zj_m, H=Hc, TT=TT)
+Q.Hw <- Qstat(Zj_m, H=Hw, TT=TT)
+
+write.csv(moberg_estimates, file.path(output_table_path, 
+                                "TC3_moberg_estimates.csv"))
+
+```
+
+```{r TC3. Moberg estimates reading}
+TC3.mobergEstimates <- read.csv(file.path(output_table_path, "TC3_moberg_estimates.csv"))
+
+TC3.mobergEstimates[,1] <- c("$\\mu$", "$\\sigma$", "$\\mu_c$", "$\\sigma_c$",
+                   "$H_c$", "$H_w$", "$SE(H_w)$", "$Q(H_c)$",  "$Q(H_w)$")  
+kable(TC3.mobergEstimates, digits=3, align='c' , escape = F,
+      col.names = c("Parameters and statistics", "Value"))
+```
+
+The results of Table C3 show that the FGN model is rejected for the Moberg data when the respective estimated Hurst parameters are used.
+
+## Table C4. Chi-square statistics based on the data of Moberg et al. (2009)
+
+```{r TC4. Moberg grid, eval=F}
+Hvec <- seq(0.92, 0.98, by=0.01)
+
+Qt <- NULL
+  for (Hval in Hvec){
+    Qt <- c(Qt, Qstat(Zj_m, H=Hval, TT=TT))    
+  }
+
+moberg_Qt_grid <- data.frame(H=Hvec, Qt)
+
+write.csv(moberg_Qt_grid, row.names=F, file.path(output_table_path, 
+                                "TC4_moberg_Qt_grid.csv"))
+
+```
+
+
+```{r TC4. Moberg grid reading}
+TC4.mobergQtGrid <- read.csv(file.path(output_table_path,
+                                       "TC4_moberg_Qt_grid.csv"))
+kable(TC4.mobergQtGrid, digits=3, align='c',
+      col.names = c("H", "Q(H)"))
+```
+
+The results of Table C4 shows that the power of the Q test is high (conditional on the FGN model). In particular, when H = 0.95 then Q(H) $\in$ (-1.96, 1.96) whereas when H equals 0.94 or 0.96 (or further away from 0.95) then Q(H) $\notin$ (-1.96, 1.96) which means rejection of FGN. 
+
+## Table C5. Stationarity test. Moberg data
+
+```{r TC5. Moberg stationarity test, eval = F}
+
+Stationary_moberg <- matrix(0, nrow=2, ncol=3)
+colnames(Stationary_moberg) <- c("test.stat","test.res","test.criterion")
+rownames(Stationary_moberg) <- c("Sign: 0.05", "Sign: 0.1")
+
+
+sign_level <- c(0.05, 0.1)
+
+for (j in 1:2) {
+        station_res <- unsys.station.test(Xj_m, M=2000,
+                                          sig.lev = sign_level[j])
+        Stationary_moberg[j,1] <- station_res$test.stat
+        Stationary_moberg[j,2] <- station_res$test.res 
+        Stationary_moberg[j,3] <- station_res$test.criterion
+        }
+
+Stationary_moberg <- as.data.frame(Stationary_moberg)
+
+
+# sum(Stationary_all_annual$test.res)
+
+write.csv(Stationary_moberg,
+          file.path(output_table_path, "TC5_Stationarity_moberg.csv"))
+
+```
+
+```{r TC5. Moberg stationarity test reading}
+TC5.Stationarity_moberg <- read.csv(file.path(output_table_path,
+                                              "TC5_Stationarity_moberg.csv"))
+rownames(TC5.Stationarity_moberg) <- c("Significance level: 0.05", 
+                                       "Significance level: 0.1")
+TC5.Stationarity_moberg$X <- NULL
+
+TC5.Stationarity_moberg$test.res <- replace(TC5.Stationarity_moberg$test.res,
+                                            TC5.Stationarity_moberg$test.res==0, 
+                                            "no rejection")
+                            
+                       
+
+kable(TC5.Stationarity_moberg, digits=3, align='c',
+      col.names = c( "Test statistic", "Test result", "Test criterion"))
+```
+  
+  
+  
+\pagebreak
+
+
+
+## Table C6. Stationarity test. Annual data
+
+```{r TC6. Annual stationarity test, eval = F}
+
+Stationary_all_annual <- matrix(0, nrow=nja, ncol=3)
+colnames(Stationary_all_annual) <- c("test.stat","test.res","test.criterion")
+rownames(Stationary_all_annual) <- paste0(all$Country, ",", all$Station)
+
+for (j in 1:nja) {
+        #--- 1. Data reading 
+        data <- read.delim(data_dir_all[j], header=F, na.strings=99)
+          Xj <- data[,14] 
+          Zj <- Xj[!is.na(Xj)]
+        #--- 2. Estimation
+        station_res <- unsys.station.test(Zj, M=2000, sig.lev = 0.01)
+        Stationary_all_annual[j,1] <- station_res$test.stat
+        Stationary_all_annual[j,2] <- station_res$test.res 
+        Stationary_all_annual[j,3] <- station_res$test.criterion
+        }
+
+Stationary_all_annual <- as.data.frame(Stationary_all_annual)
+
+# sum(Stationary_all_annual$test.res)
+
+write.csv(Stationary_all_annual,
+          file.path(output_table_path, "TC6_Stationarity_all_annual.csv"))
+
+```
+
+```{r TC6. Annual stationarity test reading}
+TC6.Stationarity_all_annual <- read.csv(file.path(output_table_path,
+                                                  "TC6_Stationarity_all_annual.csv")) 
+
+TC6.Stationarity_all_annual <- TC6.Stationarity_all_annual %>%
+  mutate(test.res = case_when(test.res == 0 ~ "no rejection",
+                         test.res == 1 ~ "rejection"))
+
+kable(TC6.Stationarity_all_annual, digits=3, align='c',
+      col.names = c(" Weather station", "Test statistic", 
+                    "Test result", "Test criterion"))
+```
+
+
+From Table C6 we note that only in one case (Djupivogur, Iceland) do the data reject the stationarity hypothesis.
+
+\pagebreak
+
+
+## Table C7. Stationarity test. Monthly data
+
+```{r TC5. Monthly stationarity test, eval = F}
+Stationarity_all <- matrix(0, nrow=nja, ncol=3)
+colnames(Stationarity_all) <- c("test.stat","test.res","test.criterion")
+rownames(Stationarity_all) <- paste0(all$Country, ",", all$Station)
+
+for (j in 1:nja) {
+        #--- 1. Data reading 
+        data <- read.delim(data_dir_all[j], header=F, na.strings=99)
+        Zm <- monthlyAdj(data, scale=T)$Zm
+        
+        #--- 2. Estimation
+        station_res <- unsys.station.test(Zm, M=2000, sig.lev = 0.01)
+        Stationarity_all[j,1] <- station_res$test.stat
+        Stationarity_all[j,2] <- station_res$test.res 
+        Stationarity_all[j,3] <- station_res$test.criterion
+        }
+
+Stationarity_all <- as.data.frame(Stationarity_all)
+
+# sum(Stationarity_all$test.res)
+
+write.csv(Stationarity_all, file.path(output_table_path, 
+                                "TC7.Stationarity_all.csv"))
+
+```
+
+```{r TC7. Monthly stationarity test reading}
+TC7.Stationarity_all <- read.csv(file.path(output_table_path, "TC7_Stationarity_all.csv"))
+
+TC7.Stationarity_all <- TC7.Stationarity_all %>%
+  mutate(test.res = case_when(test.res == 0 ~ "no rejection",
+                         test.res == 1 ~ "rejection"))
+
+kable(TC7.Stationarity_all, digits=3, align='c',
+      col.names = c(" Weather station", "Test statistic", "Test result", 
+                    "Test criterion"))
+```
+
+
+Table C7 shows that stationarity (based on the default option of Cho’s test) is rejected for data from 14 weather stations when monthly time series are used.
+
+\newpage
+
+## Table C8. Estimation of H using the Wavelet Lifting estimator. Monthly data 
+
+```{r, eval = F}
+# Wavelet estimation for all time series
+Parameters <- data.frame()
+for (j in 1:nja) {
+        #--- 1. Data reading 
+        data <- read.delim(data_dir_all[j], header=F, na.strings=99)
+        Zm <- monthlyAdj(data, scale=T)$Zm
+        timeindex <- which(!is.na(data[,2:13]))
+        nmiss <- sum(is.na(Zm))
+        #--- 2. Estimation
+        Hvec <- c(liftHurst(Zm, grid=timeindex), nmiss)
+        Parameters <- rbind(Parameters, Hvec)
+        }
+
+colnames(Parameters) <- c("Beta", "Hl", "Sd_Hl", "Lo_Hl", "Hi_Hl", "Missing")
+Parameters <- cbind(stationame_all, Parameters)
+saveRDS(Parameters, file.path(output_supporting_path, "wavelet_H_all.rds"))
+
+# Comparison between Wavelet and Whittle estimator
+Hl_tbl <- readRDS(file.path(output_supporting_path, "wavelet_H_all.rds"))
+Hw_tbl <- read.csv(file.path(output_table_path, "TC1_monthly_H_all.csv")) %>%
+  rename(stationame_all = X)
+H_comparison_tbl <- Hl_tbl %>%
+  left_join(Hw_tbl) %>%
+  select(-c(Beta, Missing)) %>%
+  mutate(Lo_Hw = Hw - 3*SE_Hw,
+         Hi_Hw = Hw + 3*SE_Hw,
+         overlap = case_when(Hi_Hl < Lo_Hw | Hi_Hw < Lo_Hl ~ 0,
+                                 TRUE ~ 1))
+
+# Q statistics for Whittle and Wavelet estimator for all time series
+H_comparison_tbl$Q_Hl <- NA
+H_comparison_tbl$Q_Hw <- NA
+for (j in 1:nja){
+ data <- read.delim(data_dir_all[j], header=F, na.strings=99)
+ Zm <- monthlyAdj(data, scale=T)$Zm
+ TT <- length(Zm)
+ Hl <- H_comparison_tbl[j, "Hl"]
+ Hw <- H_comparison_tbl[j, "Hw"]
+ H_comparison_tbl[j, "Q_Hl"] <- Qstat(Zm, H=Hl, TT=TT)
+ H_comparison_tbl[j, "Q_Hw"] <- Qstat(Zm, H=Hw, TT=TT)
+}
+
+# Saving Whittle vs Wavalet estimation table
+write.csv(H_comparison_tbl, 
+          file.path(output_table_path, "TC8_monthly_all_H_wavelet.csv"))
+```
+
+```{r }
+H_comparison_tbl <- read.csv( 
+          file.path(output_table_path, "TC8_monthly_all_H_wavelet.csv"))
+```
+
+
+
+```{r TC8. Wavelet and Whittle estimator comparison}
+H_comparison_tbl %>%
+  select(stationame_all, Hl, Q_Hl) %>%
+  kable(digits=3, align='c',
+      col.names = c("Weather station", "$H_{wav}$", "$Q(H_{wav})$"))
+```
+
+\newpage
+
+## Figure C1. Comparison between the Wavelet Lifting and the Whittle estimator
+
+Wavelet Lifting vs Whittle estimates of H, with 95% confidence bands
+
+\vspace{0.5cm}
+
+```{r FC1. Wavelet and Whittle graphical comparison, fig.height=8, fig.align= "c"}
+# Long data format
+H_comparison_tbl_long <- data.frame(
+  City = rep(1:96, 2),
+    City_label = rep(H_comparison_tbl$stationame_all, 2),
+    Method = rep(c("Wavelet", "Whittle"), each = 96),
+    H = c(H_comparison_tbl$Hl, H_comparison_tbl$Hw),
+    Low = c(H_comparison_tbl$Lo_Hl, H_comparison_tbl$Lo_Hw),
+    High = c(H_comparison_tbl$Hi_Hl, H_comparison_tbl$Hi_Hw)
+  )
+
+# Plot
+H_comparison_tbl_long %>%
+  ggplot() +
+  geom_line(aes(x = City, y = H, col = Method)) +
+  geom_ribbon(aes(x = City, ymin = Low, ymax = High,
+                  fill = Method), alpha = 0.3) +
+  scale_x_continuous(breaks=1:96, 
+                     labels=stationame_all) +
+  theme_minimal() +
+   theme(#axis.text.x = element_text(angle = 90, size = 2),
+         axis.text.y = element_text(size = 5)) +
+  coord_flip() +
+  labs(# title = "Whittle vs Wavelet Lifting estimates of H", 
+       # subtitle = "with 95% confidence intervals",
+       x = "")
+
+ ggsave(file.path(output_figure_path, "FC1_H_wavelet_whittle_plot.png"),
+        width = 5, height = 7)
+```
+
+
+
+
+
+
+\newpage
+
+
+
+
+\pagebreak
+
+# APPENDIX D - PROPERTIES OF THE ESTIMATORS  
+  
+## Table D1, D2, D3. Tables D1, D2, D3. Properties of different estimators of the FGN model. Bootstrap simulations
+
+
+The following tables show the results of the bootstrap simultations for different estimators of $\mu$, $\sigma$, $H$ and $\alpha$, given the FGN model with H equal to 0.7, 0.8, 0.9, 0.95.
+
+Each bootstrap estimate is based on 1,000 simulated FGN series of length 2,000.
+
+```{r Bootstrap estimation for given H, eval=FALSE}
+
+#--- 1. Parameters choice
+Hvec <- c(0.7, 0.8, 0.9, 0.95)
+N <- 1000
+Tlenght <- 2000 
+estimator_names <- c("Mu_c", "Mu_ML", "Sigma_c", "Sigma_ML", "H_c", "H_ML", 
+                     "Alpha_c", "Q_Stat", "Mean", "Sd")
+
+start <- Sys.time()
+
+#--- 2. Bootstrap estimation
+for (j in 1:4){
+          H <- Hvec[j]
+          start <- Sys.time()
+          print(paste0("----- H = ", H, " ----- ", Sys.time()))
+          Parameters <- matrix(0, nrow=N, ncol=10)
+          colnames(Parameters) <- estimator_names
+          #--- 3a. Estimation for given H
+          for (i in 1:N){
+                         Zjsim <- simFGN0(Tlenght, H)
+                         reg <- estim.cf.reg(Yj=Zjsim, FBM=F)
+                         Hw <- estim.w.H(Zjsim)
+                         mu_ML <- FgnMean(Zjsim, H=Hw, sigma=1)
+                         Parameters[i,1] <- estim.cf.mu(Zj=Zjsim)
+                         Parameters[i,2] <- mu_ML
+                         Parameters[i,3] <- reg["Sigma"]
+                         Parameters[i,4] <- FgnVar(Zjsim, mu_ML)
+                         Parameters[i,5] <- reg["H"]
+                         Parameters[i,6] <- Hw
+                         Parameters[i,7] <- estim.cf.alpha(Yj=Zjsim, FBM=T)
+                         Parameters[i,8] <- Qstat(Zjsim, H=H, TT=Tlenght)
+                         Parameters[i,9] <- mean(Zjsim)
+                         Parameters[i,10] <- sd(Zjsim)
+          }
+          write.csv(Parameters, file.path(output_supporting_path, 
+                                paste0("TD1.2.3_Full_Estimator_Tab_H=", H,".csv"))) 
+
+          print(Sys.time() - start)
+}
+
+```
+
+
+```{r Bootstrap aggregation: parameters mean and SE, eval=FALSE}
+#--- 1. Matrix building
+Hvec <- c(0.7, 0.8, 0.9, 0.95)
+estimator_names <- c("Mu_c", "Mu_ML", "Sigma_c", "Sigma_ML", "H_c", "H_ML", 
+                     "Alpha_c", "Q_Stat")
+Boots_Estim <- matrix(0, nrow=4, ncol=8)
+ colnames(Boots_Estim) <- estimator_names
+ rownames(Boots_Estim) <- Hvec
+Boots_SE <- Boots_Estim
+
+# 2. Estimation computing 
+for (j in 1:4){ 
+      H <- Hvec[j]
+      Parameters <- read.csv(file.path(output_supporting_path, 
+                                paste0("TD1.2.3_Full_Estimator_Tab_H=", H,".csv")))[,2:9]  
+                 estim <- apply(Parameters, 2, mean)
+                 SE <- apply(Parameters, 2, sd)
+                 Boots_Estim[j,] <- estim
+                 Boots_SE[j,] <- SE
+      }
+  
+
+Boots_Estim <- as.data.frame(Boots_Estim)
+Boots_SE <- as.data.frame(Boots_SE)
+
+write.csv(Boots_Estim, file.path(output_supporting_path, 
+                                "TD1.2.3_properties_boots_estim.csv")) 
+write.csv(Boots_SE, file.path(output_supporting_path, 
+                                "TD1.2.3_properties_boots_SE.csv")) 
+```
+
+
+
+
+
+### Table D1. Results of the bootstrap simulations for estimators of $\mu$ and $\sigma$
+
+
+* *$\mu_c$* is the characteristic function estimator for the mean, and *$SE(\mu_c)$* is its bootstrap simulation standard error
+
+* *$\mu_{ML}$* is the maximum likelihood estimator for the mean, and *$SE(\mu_{ML})$* is its bootstrap standard error
+
+* *$\sigma_c$* is the characteristic function estimator for the standard deviation, and *$SE(\sigma_{ML})$* is its bootstrap standard error
+
+* *$\sigma_{ML}$* is the maximum likelihood estimator for the standard deviation, and *$SE(\sigma_{ML})$* is its bootstrap standard error
+
+
+
+```{r TD1. Mu and sigma table}
+
+#=== TD1 READING and BUILDING 
+TD123.bootsMuSigmaEstim <- read.csv(file.path(output_supporting_path,
+                                        "TD1.2.3_properties_boots_estim.csv"))
+TD123.bootsMuSigmaSE <- read.csv(file.path(output_supporting_path,
+                                        "TD1.2.3_properties_boots_SE.csv"))
+TD1a <- data.frame(
+  H = TD123.bootsMuSigmaEstim[,1],
+  Mu_c = TD123.bootsMuSigmaEstim$Mu_c,
+  Mu_c_SE = TD123.bootsMuSigmaSE$Mu_c,
+  Mu_ML = TD123.bootsMuSigmaEstim$Mu_ML,
+  Mu_ML_SE = TD123.bootsMuSigmaSE$Mu_ML
+  )
+
+TD1b <- data.frame(
+  H = TD123.bootsMuSigmaEstim[,1],
+  Sigma_c = TD123.bootsMuSigmaEstim$Sigma_c,
+  Sigma_c_SE = TD123.bootsMuSigmaSE$Sigma_c,
+  Sigma_ML = TD123.bootsMuSigmaEstim$Sigma_ML,
+  Sigma_ML_SE = TD123.bootsMuSigmaSE$Sigma_ML
+  )
+
+
+kable(TD1a, digits=3, align='c', escape = F,
+      col.names = c("H", "$\\mu_c$", "$SE(\\mu_c)$",
+                    "$\\mu_{ML}$", "$SE(\\mu_{ML})$"))
+kable(TD1b, digits=3, align='c', escape = F,
+      col.names = c("H", "$\\sigma_c$", "$SE(\\sigma_c)$",
+                    "$\\sigma_{ML}$", "$SE(\\sigma_{ML})$"))
+```
+
+The results in Table D1 show that the standard errors of the respective estimators for the mean increase substantially when H increases. Also the estimators for $\sigma$ become severely downward biased.
+
+
+### Table D2. Bootstrap simulations results for the *H* parameter 
+
+* $H_c$ is the characteristic function estimator for the H parameter, and $SE(H_c)$ is its bootstrap standard error
+
+* *$H_w$* is the Whittle estimator for the the H parameter, and *$SE(\mu_{ML})$* is its bootstrap standard error
+
+```{r TD2. H table}
+#=== TD2 READING and BUILDING 
+
+TD2 <- data.frame(
+  H = TD123.bootsMuSigmaEstim[,1],
+  H_c = TD123.bootsMuSigmaEstim$H_c,
+  H_c_SE = TD123.bootsMuSigmaSE$H_c,
+  H_ML = TD123.bootsMuSigmaEstim$H_ML,
+  H_ML_SE = TD123.bootsMuSigmaSE$H_ML
+  )
+
+
+kable(TD2, digits=3, align='c', escape = F,
+      col.names = c("H", "$H_c$", "$SE(H_c)$",
+                    "$H_{ML}$", "$SE(H_{ML})$"))
+```
+
+Table D2 shows that the characteristic function estimator becomes downward biased as H increases. 
+
+### Table D3. Bootstrap simulations results for the $\alpha$ parameter of the stable distribution
+
+*$\alpha_c$* is the characteristic function estimator for the $\alpha$ parameter, and *$SE(\alpha_c)$* is its bootstrap standard error
+
+```{r TD3. Alpha table}
+#=== TD3 READING and BUILDING 
+
+TD3 <- data.frame(
+  H = TD123.bootsMuSigmaEstim[,1],
+  Alpha_c = TD123.bootsMuSigmaEstim$Alpha_c,
+  Alpha_c_SE = TD123.bootsMuSigmaSE$Alpha_c
+  )
+
+# rownames(TD3) <- TD123.bootsMuSigmaEstim[,1]
+
+kable(TD3, digits=3, align='c', escape = F,
+      col.names = c("H", "$\\alpha_c$", "$SE(\\alpha_c)$"))
+```
+
+The results in Table D3 show that the characteristic function estimator in this case performs very well at any level of H.
+
+\pagebreak
+
+## Figure D1 and D2. Graphical test of asymptotic normality of the characteristic function estimators
+
+Bootstrap estimates based on 1,000 simulated FGN series of length 2,000.  
+
+```{r FD1. Qqplot - Ch. fun. estimators, eval = F}
+# 3x3 plot matrix
+pdf(file.path(output_figure_path, "FD1_estimators_qqplot.pdf"),
+    width=7, height=10)
+par(mfrow=c(3, 3))
+# Testing for different H values
+  for(H in c(0.7, 0.8, 0.9)){
+    # Data reading: estimators value during bootstrap simulations
+    Parameters <- read.csv(file.path(output_supporting_path, 
+                                paste0("TD1.2.3_Full_Estimator_Tab_H=", H,".csv")))
+    # Q-qplot
+    qqnorm(Parameters$mu_c, main=paste("Mu qqplot - H =", H))
+    qqnorm(Parameters$Sigma_c, main=paste("Sigma qqplot - H =", H))
+    qqnorm(Parameters$H_c, main=paste("H qqplot - H =", H))
+  }
+dev.off()
+```
+
+```{r FD1. Printing, out.width = "85%"}
+include_graphics(file.path(output_figure_path, "FD1_estimators_qqplot.pdf"))
+```
+
+
+
+```{r FD2. Hist - Ch. fun. estimators, eval = F}
+pdf(file.path(output_figure_path, "FD2_estimators_hist.pdf"),
+    width = 7, height = 10)
+# 3x3 plot matrix
+par(mfrow=c(3, 3))
+# Testing for different H values
+for(H in c(0.7, 0.8, 0.9)){
+  # Data reading: estimators value during bootstrap simulations
+  Parameters <- read.csv(file.path(output_supporting_path, 
+                                   paste0("TD1.2.3_Full_Estimator_Tab_H=", H,".csv")))
+  # Histograms
+  hist(Parameters$Mu_c, breaks = 25, col ="black", 
+       main=paste("Mu distribution - H =", H), xlab=NULL) 
+  abline(v=0, col=2)
+  hist(Parameters$Sigma_c, breaks = 25, col ="black", 
+       main=paste("Sigma distribution - H =", H), xlab=NULL)
+  abline(v=1, col=2)
+  hist(Parameters$H_c, breaks = 25, col ="black", 
+       main=paste("H distribution - H =", H), xlab=NULL)
+  abline(v=H, col=2)
+}
+dev.off()
+```
+
+```{r FD2. Printing}
+include_graphics(file.path(output_figure_path, "FD2_estimators_hist.pdf"))
+```
+
+\pagebreak
+
+
+## Figure D3. Graphical test of the distribution of the Chi-Square statistics Q when estimated H values are inserted
+
+
+Bootstrap estimates based on 1,000 simulated FGN series of length 2,000.
+
+H estimated by the Whittle method.
+
+```{r FD3. Bootstrap estimation of Q with given Hw, eval=FALSE}
+
+#--- 1. Parameters choice
+Hvec <- c(0.8, 0.9)
+N <- 1000
+Tlenght <- 2000 
+estimator_names <- c("Hw", "Q.Hw")
+
+start <- Sys.time()
+
+#--- 2. Bootstrap estimation
+for (H in Hvec){
+          start <- Sys.time()
+          print(paste0("----- H = ", H, " ----- ", Sys.time()))
+          Parameters <- matrix(0, nrow=N, ncol=2)
+          colnames(Parameters) <- estimator_names
+          #--- 3a. Estimation for given H
+          for (i in 1:N){
+                         Zjsim <- simFGN0(Tlenght, H)
+                         Hw <- estim.w.H(Zjsim)
+                         mu_ML <- FgnMean(Zjsim, H=Hw, sigma=1)
+                         Parameters[i,1] <- Hw
+                         Parameters[i,2] <- Qstat(Zjsim, H=Hw, TT=Tlenght)
+          }
+          write.csv(Parameters, file.path(output_supporting_path, 
+                                paste0("FD3_Q.Hw_Estimation_H=", H,".csv"))) 
+
+          print(Sys.time() - start)
+}
+
+```
+
+
+\vspace{1cm}
+
+```{r FD3. Q dist given Hw: hist and N test, fig.height= 6}
+
+# 3x3 plot matrix
+# png(file.path(output_figure_path, "FD3_Qstat_distribution_Hw.png"),
+#     width = 960, height = 950)
+par(mfrow=c(2, 2))
+# Testing for different H values
+  for(H in c(0.8, 0.9)){ 
+    # Data reading: estimators value during bootstrap simulations
+    Q_Stat <- read.csv(file.path(output_supporting_path, 
+                                paste0("FD3_Q.Hw_Estimation_H=", H,".csv")))$Q.Hw
+    # Q-qplot
+   hist(Q_Stat, breaks = 100, col ="black", 
+        main=paste("Q distribution - H =", H), xlab=NULL)    
+   abline(v=0, col=2)
+   fgtNormality(Yj=cumsum(Q_Stat), xmax=0.7, main=paste("- H = ", H), cex.dots=1.5,
+                     cex.axis=1,cex.main=1.2)$plot
+  }
+# dev.off()
+```
+
+\vspace{1cm}
+
+```{r FD3. Printing}
+# include_graphics(file.path(output_figure_path, "FD3_Qstat_distribution_Hw.png"))
+```
+
+Figure D3 shows that Q is approximately normally distributed when H = 0.8 whereas the distribution becomes skew to the right when H = 0.9. (similar to a stable distribution that is totally skew to the right) 
+
+
+
+## Figure D4. Theoretical vs unbiased bootstrap autocorrelations
+
+\vspace{0.5cm}
+
+```{r, eval = F}
+unbiased_autocorr_tbl <- read.csv(
+  file.path(output_supporting_path, "FD4_Unbiased_autocorrelation_tbl.csv"))
+
+unbiased_autocorr_long2 <- unbiased_autocorr_tbl %>%
+  select(Lag, Theoretical, Simulated = simulated) %>%
+  gather("Autocorrelation", "Value", -Lag)
+
+unbiased_autocorr_long2 %>%
+  ggplot(aes(x = Lag, y = Value, colour = Autocorrelation)) +
+  ylim(0, 1) +
+  geom_line()  +
+  geom_point() +
+  scale_colour_manual(values = c("orange", "blue"),
+                      labels = c("Simulated", "FGN model")) +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  labs(title = "Bootstrap vs FGN autocorrelations",
+       subtitle = "H = 0.95 - with bias correction formula",
+       y = "Autocorrelation")
+
+ggsave(file.path(output_figure_path, "FD4_bootstrap_autocorrelation.png"))
+```
+
+```{r FD4. Printing }
+include_graphics(file.path(output_figure_path, "FD4_bootstrap_autocorrelation.png"))
+```
+
+
+
+\newpage
+
+# Figure D5. Impact of missing data on the Q statistics
+
+Simulation of 1,000 time series of length 2,000 and H = 0.8. 
+
+Allowing for 70 randomly dispersed data points.
+
+\vspace{0.5cm}
+
+```{r eval = F}
+# Not run - About 25 hours
+
+# Fgn simulation
+db <- sim.multiFGN(N = 1000, Tj = 2000, H = 0.8)
+NNA <- 70
+
+# Na imputation 
+set.seed(NULL)
+na_in_vector <- function(x) {
+  rnd_places <- sample(1:length(x), size = NNA)
+  x[rnd_places] <- NA_real_
+  x   
+}
+db_with_NA <- map_dfc(db, na_in_vector)
+
+# NA removal
+remove_NA <- function(x) {
+  na.omit(x)
+} 
+db_without_NA <- map_dfc(db_with_NA, remove_NA)
+
+# Q statistics computation
+Q_vec <- apply(db_without_NA, 2, Qstat, H = 0.8, TT = 2000 - NNA)
+
+saveRDS(Q_vec, file = file.path(output_supporting_path, "Q_H08_missing.rds"))
+```
+
+```{r}
+Q_vec <- readRDS(file.path(output_supporting_path, "Q_H08_missing.rds"))
+```
+
+
+Bootstrap mean of Q: `r round(mean(Q_vec), 3)`.
+
+Bootstrap standard deviation of Q: `r round(sd(Q_vec), 3)`.
+
+\vspace{0.5cm}
+
+Normality of Q:
+
+\vspace{0.5cm}
+
+```{r eval = F}
+png(file.path(output_figure_path, "FD5_Q_performance_with_missing_data.png"),
+    width = 700, height = 480)
+par(mfrow=c(1, 2))
+fgtNormality(Yj=cumsum(Q_vec), xmax=1, main=NULL, cex.axis=0.8,
+                         cex.lab=0.8, cex.main=1, cex.dots=1, lwd=1)$plot
+qqnorm(Q_vec)
+dev.off()
+```
+
+```{r fig.height=4}
+par(mfrow=c(1, 2))
+fgtNormality(Yj=cumsum(Q_vec), xmax=1, main=NULL, cex.axis=0.8,
+                         cex.lab=0.8, cex.main=1, cex.dots=1, lwd=1)$plot
+qqnorm(Q_vec)
+```
+
+
+\newpage
+
+# Figure D6. Performance of the Q statistics when H = 0.95
+
+Simulation of 1,000 time series of length 2,000 and H = 0.95.
+
+\vspace{0.5cm}
+
+```{r eval = F}
+db <- sim.multiFGN(N = 1000, Tj = 2000, H = 0.95)
+
+Q_vec <- apply(db, 2, Qstat, H = 0.95, TT = 2000)
+
+saveRDS(Q_vec, file = file.path(output_supporting_path, "Q_H095.rds"))
+```
+
+```{r}
+Q_095 <- readRDS(file.path(output_supporting_path, "Q_H095.rds"))
+```
+
+\vspace{0.5cm}
+
+Bootstrap mean of Q: `r round(mean(Q_095), 3)`.
+
+Bootstrap standard deviation of Q: `r round(sd(Q_095), 3)`.
+
+\vspace{0.5cm}
+
+Normality of Q:
+
+\vspace{0.5cm}
+
+
+```{r eval = F}
+png(file.path(output_figure_path, "FD5_Q_performance_with_missing_data.png"),
+    width = 700, height = 480)
+par(mfrow=c(1, 2))
+fgtNormality(Yj=cumsum(Q_095), xmax=1, main=NULL, cex.axis=0.8,
+                         cex.lab=0.8, cex.main=1, cex.dots=1, lwd=1)$plot
+qqnorm(Q_095)
+dev.off()
+```
+
+```{r fig.height=4}
+par(mfrow=c(1, 2))
+fgtNormality(Yj=cumsum(Q_095), xmax=1, cex.axis=0.8, main = "",
+                         cex.lab=0.8, cex.main=1, cex.dots=1, lwd=1)$plot
+qqnorm(Q_095)
+```
+
+
+
+
+

@@ -1,0 +1,97 @@
+;Country;Station;Dir;Lon;Lat
+1;Argentina;Buenos Aires;Argentina\Buenos Aires.txt;-58,3815931;-34,6037232
+2;Australia;Adelaide;Australia\Adelaide.txt;138,5999594;-34,9286212
+3;Australia;Alice Springs;Australia\Alice Springs.txt;133,8806114;-23,7002104
+4;Australia;Cap Otway;Australia\Cap Otway.txt;143,5237878;-38,8526735
+5;Austria;Kremsmunster;Austria\Kremsmunster.txt;14,1261878;48,0543599
+6;Austria;Vienna;Austria\Vienna.txt;16,3738189;48,2081743
+7;Belgium;Uccle;Belgium\Uccle.txt;4,34067;50,8023982
+8;Canada;Winnipeg;Canada\Winnipeg.txt;-97,1374937;49,8997541
+9;Croatia;Zagreb;Croatia\Zagreb.txt;15,981919;45,8150108
+10;Czech Republic;Prague;Czech Republic\Prague.txt;14,4378005;50,0755381
+11;Denmark;Copenhagen;Denmark\Copenhagen.txt;12,5683371;55,6760968
+12;Denmark;Vestervig;Denmark\Vestervig.txt;8,317716;56,762566
+13;Egypt;Alexandria;Egypt\Alexandria.txt;29,55;31,12
+14;France;Nantes;France\Nantes.txt;-1,553621;47,218371
+15;France;Paris;France\Paris.txt;2,3522219;48,856614
+16;Germany;Berlin;Germany\Berlin.txt;13,404954;52,5200066
+17;Germany;Hohenpeissenberg;Germany\Hohenpeissenberg.txt;11,0057709;47,7944708
+18;Germany;Karlsruhe;Germany\Karlsruhe.txt;8,4036527;49,0068901
+19;Greece;Athens;Greece\Athens.txt;23,7293599;37,983917
+20;Greenland;Illulisat;Greenland\Illulisat.txt;-51,1;69,216667
+21;Greenland;Ivittuut;Greenland\Ivittuut.txt;-48,1738106;61,2061189
+22;Hungary;Budapest;Hungary\Budapest.txt;19,040235;47,497912
+23;Iceland;Djupivogur;Iceland\Djupivogur.txt;-14,2900509;64,656888
+24;Iceland;Reykjavik;Iceland\Reykjavik.txt;-21,933333;64,133333
+25;India;Agra;India\Agra.txt;78,0080745;27,1766701
+26;India;Allahabad;India\Allahabad.txt;81,846311;25,4358011
+27;India;Bombay;India\Bombay.txt;72,8776559;19,0759837
+28;India;Indore;India\Indore.txt;75,8577258;22,7195687
+29;India;Madras;India\Madras.txt;80,2707184;13,0826802
+30;India;Nagpur;India\Nagpur.txt;79,0881546;21,1458004
+31;Israel;Jerusalem;Israel\Jerusalem.txt;35,21371;31,768319
+32;Italy;Bologna;Italy\Bologna.txt;11,3426163;44,494887
+33;Italy;Milan;Italy\Milan.txt;9,1859243;45,4654219
+34;Japan;Hiroshima;Japan\Hiroshima.txt;132,4552927;34,3852029
+35;Japan;Nagasaki;Japan\Nagasaki.txt;129,877667;32,7502856
+36;Japan;Tokyo;Japan\Tokyo.txt;139,6917064;35,6894875
+37;Kazakhstan;Kazalinsk;Kazakhstan\Kazalinsk.txt;62,1;45,766667
+38;Luxembourg;Luxembourg;Luxembourg\Luxembourg.txt;6,129583;49,815273
+39;New Zealand;Wellington;New Zealand\Wellington.txt;174,776236;-41,2864603
+40;Norway;Andoya;Norway\Andoya.txt;15,6655207;69,1211442
+41;Norway;Bergen;Norway\Bergen.txt;5,3220544;60,3912628
+42;Norway;Bodo;Norway\Bodo.txt;14,404916;67,2803556
+43;Norway;Dombas;Norway\Dombas.txt;9,1272327;62,0751113
+44;Norway;Karasjok;Norway\Karasjok.txt;25,511162;69,4718727
+45;Norway;Mandal;Norway\Mandal.txt;7,4533303;58,0276808
+46;Norway;Oksoy Lighthouse;Norway\Oksoy Lighthouse.txt;8,0526787;58,0722679
+47;Norway;Ona;Norway\Ona.txt;6,55;62,8666
+48;Norway;Oslo;Norway\Oslo.txt;10,7522454;59,9138688
+49;Norway;Roros;Norway\Roros.txt;11,3841068;62,5748112
+50;Norway;Tromso;Norway\Tromso.txt;18,9553238;69,6492047
+51;Norway;Utsira;Norway\Utsira.txt;4,8820629;59,308129
+52;Norway;Vardo;Norway\Vardo.txt;31,1095471;70,3706399
+53;Pakistan;Lahore;Pakistan\Lahore.txt;74,3571581;31,5546061
+54;Portugal;Lisbon;Portugal\Lisbon.txt;-9,1393366;38,7222524
+55;Romania;Sulina;Romania\Sulina.txt;29,652778;45,159444
+56;Russia;Archangelsk;Russia\Archangelsk.txt;40,5601553;64,5472507
+57;Russia;Sort;Russia\Sort.txt;26,4265213;58,60658
+58;Russia;St Petersburg;Russia\St Petersburg.txt;30,3350986;59,9342802
+59;Spain;Gibraltar;Spain\Gibraltar.txt;-5,353585;36,140751
+60;Sweden;Bromma;Sweden\Bromma.txt;9,1913573;60,4874196
+61;Sweden;Stockholm;Sweden\Stockholm.txt;18,0685808;59,3293235
+62;Sweden;Tullinge;Sweden\Tullinge.txt;17,9;59,2
+63;Sweden;Uppsala;Sweden\Uppsala.txt;17,6389267;59,8585638
+64;Switzerland;Basel;Switzerland\Basel.txt;7,5975507;47,5674422
+65;Switzerland;Geneva;Switzerland\Geneva.txt;6,1422961;46,1983922
+66;UK;Aberdeen;UK\Aberdeen.txt;-2,094278;57,149717
+67;UK;Belfast;UK\Belfast.txt;-5,93012;54,597285
+68;UK;Cambridge;UK\Cambridge.txt;0,0721;52,1229
+69;UK;Durham;UK\Durham.txt;1,34;54,46
+70;UK;Edinbourg;UK\Edinbourg.txt;-3,188267;55,953252
+71;UK;London;UK\London.txt;-0,1277583;51,5073509
+72;UK;Plymouth;UK\Plymouth.txt;-4,1426565;50,3754565
+73;USA;Atlanta;USA\Atlanta.txt;-84,3879824;33,7489954
+74;USA;Bismarck;USA\Bismarck.txt;-100,7837392;46,8083268
+75;USA;Boise;USA\Boise.txt;-116,2146068;43,6187102
+76;USA;Boston;USA\Boston.txt;-71,0588801;42,3600825
+77;USA;Chattanooga;USA\Chattanooga.txt;-85,3096801;35,0456297
+78;USA;Cincinatti;USA\Cincinatti.txt;-84,5120196;39,1031182
+79;USA;Columbus;USA\Columbus.txt;-82,9987942;39,9611755
+80;USA;Concord;USA\Concord.txt;-122,0310733;37,9779776
+81;USA;Des Moines;USA\Des Moines.txt;-93,6091064;41,6005448
+82;USA;Detroit;USA\Detroit.txt;-83,0457538;42,331427
+83;USA;Dodge City;USA\Dodge City.txt;-100,0170787;37,7527982
+84;USA;Fargo;USA\Fargo.txt;-96,7898034;46,8771863
+85;USA;Galveston;USA\Galveston.txt;-94,7976958;29,3013479
+86;USA;Indianapolis;USA\Indianapolis.txt;-86,158068;39,768403
+87;USA;Jacksonville;USA\Jacksonville.txt;-81,655651;30,3321838
+88;USA;Knoxville;USA\Knoxville.txt;-83,9207392;35,9606384
+89;USA;Las Vegas;USA\Las Vegas.txt;-115,1398296;36,1699412
+90;USA;Madison;USA\Madison.txt;-89,4012302;43,0730517
+91;USA;Marquette;USA\Marquette.txt;-87,3955954;46,5475825
+92;USA;Milwaukee;USA\Milwaukee.txt;-87,9064736;43,0389025
+93;USA;Mobile;USA\Mobile.txt;-88,0398912;30,6953657
+94;USA;Nashville;USA\Nashville.txt;-86,7816016;36,1626638
+95;USA;New Orleans;USA\New Orleans.txt;-90,0715323;29,9510658
+96;USA;New York;USA\New York.txt;-74,0059413;40,7127837

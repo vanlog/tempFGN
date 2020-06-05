@@ -1,0 +1,21 @@
+Package: tempFGN
+Type: Package
+Title: Code supporting the Temperature fluctuation paper
+Version: 0.2.0
+Author: Mariachiara Fortuna
+Maintainer: Mariachiara Fortuna <mariachiara.fortuna@vanlog.it>
+Description: This package provides all the functions that produced results 	 
+    included into the paper "How does the temperature vary over time? Evidence 
+    on the stationary and fractal nature of the temperature fluctuations" by 
+    J.K.Dagsvik, M. Fortuna and S. Hov Moen.
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
+Imports: 
+    dplyr,
+    tidyr,
+    longmemo,
+    lubridate,
+    stringr,
+    maps,
+    knitr

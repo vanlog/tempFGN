@@ -1,0 +1,512 @@
+plot(a)
+sim <- function(n,sigma,p0){
+Pt <- rep(p0,n)
+eta <- c(0,rnorm(n-1))
+for (i in 2:n){
+Pt[i] <- 1/(1+exp(2.65-5*Pt[i-1]-sigma*eta[i-1]))
+}
+return(Pt)}
+a <- sim(500,0,0.7)
+plot(a)
+a[500]
+sim <- function(n,sigma,p0){
+Pt <- rep(p0,n)
+eta <- c(0,rnorm(n-1))
+for (i in 2:n){
+Pt[i] <- 1/(1+exp(2.655-5*Pt[i-1]-sigma*eta[i-1]))
+}
+return(Pt)}
+a <- sim(500,0,0.7)
+plot(a)
+sim <- function(n,sigma,p0){
+Pt <- rep(p0,n)
+eta <- c(0,rnorm(n-1))
+for (i in 2:n){
+Pt[i] <- 1/(1+exp(2.653-5*Pt[i-1]-sigma*eta[i-1]))
+}
+return(Pt)}
+a <- sim(500,0,0.7)
+plot(a)
+sim <- function(n,sigma,p0){
+Pt <- rep(p0,n)
+eta <- c(0,rnorm(n-1))
+for (i in 2:n){
+Pt[i] <- 1/(1+exp(2.652-5*Pt[i-1]-sigma*eta[i-1]))
+}
+return(Pt)}
+a <- sim(500,0,0.7)
+plot(a)
+sim <- function(n,sigma,p0){
+Pt <- rep(p0,n)
+eta <- c(0,rnorm(n-1))
+for (i in 2:n){
+Pt[i] <- 1/(1+exp(2.6521-5*Pt[i-1]-sigma*eta[i-1]))
+}
+return(Pt)}
+a <- sim(500,0,0.7)
+plot(a)
+a[500]
+install.packages("knitr")
+setwd("C:\\Users\\x230\\Google Drive\\Temperature")
+dir("Data\\Raw data\\frankrike")
+data("Data\\Raw data\\frankrike\\Paris.txt")
+head(read.delim("Data\\Raw data\\frankrike\\Paris.txt"))
+head(read.delim("Data\\Raw data\\frankrike\\Paris.txt",header=F))
+setwd("C:\\Users\\x230\\Google Drive\\Temperature")
+directory <- "Data\\Raw data"
+setwd(directory)
+country <- dir()
+ncc <- length(country)
+ncc
+country
+cc <- 1
+subdir <- paste(directory,"\\",country[cc],sep="")
+setwd(subdir)
+station0 <- dir()
+station0
+subdir <- paste(directory,"\\",country[cc],sep="")
+setwd(subdir)
+station0 <- dir()
+setwd("C:\\Users\\x230\\Google Drive\\Temperature")
+directory <- "Data\\Raw data"
+setwd(directory)
+country <- dir()
+ncc <- length(country)
+cc <- 1
+information <- list()
+subdir <- paste(directory,"\\",country[cc],sep="")
+setwd(subdir)
+station0 <- dir()
+directory
+getwd()
+subdir
+setwd("C:\\Users\\x230\\Google Drive\\Temperature\\Data\\Raw data")
+setwd("C:\\Users\\x230\\Google Drive\\Temperature\\Data\\Raw data")
+country <- dir()
+ncc <- length(country)
+cc <- 1
+information <- list()
+subdir <- paste(directory,"\\",country[cc],sep="")
+subdir
+directory <- "C:\\Users\\x230\\Google Drive\\Temperature\\Data\\Raw data"
+setwd(directory)
+country <- dir()
+ncc <- length(country)
+cc <- 1
+information <- list()
+subdir <- paste(directory,"\\",country[cc],sep="")
+setwd(subdir)
+station0 <- dir()
+station0
+grep("txt",dir())
+station0 <- dir()
+station <- station0[grep(".txt",station0)]
+stationame <- sub(".txt","",station)
+nss <- length(station)
+directory <- "C:\\Users\\x230\\Google Drive\\Temperature\\Data\\Raw data"
+setwd(directory)
+country <- dir()
+ncc <- length(country)
+cc <- 1
+j <- 1
+information <- list()
+for (cc in 1:ncc){
+subdir <- paste(directory,"\\",country[cc],sep="")
+setwd(subdir)
+station0 <- dir()
+station <- station0[grep(".txt",station0)]
+stationame <- sub(".txt","",station)
+nss <- length(station)
+for (ss in 1:nss){
+data00 <- read.delim(station[ss],header=F,na.strings=99)
+n <- dim(data00)[[1]] # Length time series
+if (is.numeric(data00[,1])==FALSE|dim(data00)[[2]]!=14)
+information[[j]] <- paste0(country[cc],";",
+stationame[ss],";
+ERROR;NA;NA;NA;NA")
+else {
+nmiss <- sum(is.na(data00[,14]))
+information[[j]] <- paste0(country[cc],";",
+stationame[ss],";",
+"OK",";",
+data00[1,1],";",
+data00[n,1],";",
+n,";",
+nmiss)}
+j <- j+1
+}
+}
+n <- length(information)
+inf <- NULL
+for (i in 1:n){
+p <- unlist(strsplit(information[[i]],split=";"))
+inf <- rbind(inf,p)}
+TSinformation <- as.data.frame(inf)
+colnames(TSinformation) <- c("Country","Station","Status","From",
+"To","Length","Missing")
+View(TSinformation)
+for (cc in 1:ncc){
+subdir <- paste(directory,"\\",country[cc],sep="")
+setwd(subdir)
+station0 <- dir()
+station <- station0[grep(".txt",station0)]
+stationame <- sub(".txt","",station)
+nss <- length(station)
+for (ss in 1:nss){
+data00 <- read.delim(station[ss],header=F,na.strings=99)
+data60 <- data00[which(data00[,1]<=1960),]
+n <- dim(data00)[[1]]
+n <- dim(data60)[[1]]
+if (is.numeric(data00[,1])==FALSE|dim(data00)[[2]]!=14)
+information[[j]] <- paste0(country[cc],";",
+stationame[ss],";
+ERROR;
+NA;NA;NA;NA;NA;NA;NA")
+else {
+nmiss <- sum(is.na(data00[,14]))
+nmiss60 <- sum(is.na(data60[,14]))
+efflength60 <- n-nmiss60
+information[[j]] <- paste0(country[cc],";",
+stationame[ss],";",
+"OK",";",
+data00[1,1],";",
+data00[n,1],";",
+n,";",
+nmiss,";",
+n60,";",
+nmiss60,";",
+efflenght60)}
+j <- j+1
+}
+}
+directory <- "C:\\Users\\x230\\Google Drive\\Temperature\\Data\\Raw data"
+setwd(directory)
+country <- dir()
+ncc <- length(country)
+cc <- 1
+j <- 1
+information <- list()
+for (cc in 1:ncc){
+subdir <- paste(directory,"\\",country[cc],sep="")
+setwd(subdir)
+station0 <- dir()
+station <- station0[grep(".txt",station0)]
+stationame <- sub(".txt","",station)
+nss <- length(station)
+for (ss in 1:nss){
+data00 <- read.delim(station[ss],header=F,na.strings=99)
+n <- dim(data00)[[1]]
+if (is.numeric(data00[,1])==FALSE|dim(data00)[[2]]!=14)
+information[[j]] <- paste0(country[cc],";",
+stationame[ss],";
+ERROR;
+NA;NA;NA;NA;NA;NA;NA")
+else {
+nmiss <- sum(is.na(data00[,14]))
+data60 <- data00[which(data00[,1]<=1960),]
+n60 <- dim(data60)[[1]]
+nmiss60 <- sum(is.na(data60[,14]))
+efflength60 <- n-nmiss60
+information[[j]] <- paste0(country[cc],";",
+stationame[ss],";",
+"OK",";",
+data00[1,1],";",
+data00[n,1],";",
+n,";",
+nmiss,";",
+n60,";",
+nmiss60,";",
+efflenght60)}
+j <- j+1
+}
+}
+directory <- "C:\\Users\\x230\\Google Drive\\Temperature\\Data\\Raw data"
+setwd(directory)
+country <- dir()
+ncc <- length(country)
+cc <- 1
+j <- 1
+information <- list()
+for (cc in 1:ncc){
+subdir <- paste(directory,"\\",country[cc],sep="")
+setwd(subdir)
+station0 <- dir()
+station <- station0[grep(".txt",station0)]
+stationame <- sub(".txt","",station)
+nss <- length(station)
+for (ss in 1:nss){
+data00 <- read.delim(station[ss],header=F,na.strings=99)
+n <- dim(data00)[[1]]
+if (is.numeric(data00[,1])==FALSE|dim(data00)[[2]]!=14)
+information[[j]] <- paste0(country[cc],";",
+stationame[ss],";
+ERROR;
+NA;NA;NA;NA;NA;NA;NA")
+else {
+nmiss <- sum(is.na(data00[,14]))
+data60 <- data00[which(data00[,1]<=1960),]
+n60 <- dim(data60)[[1]]
+nmiss60 <- sum(is.na(data60[,14]))
+efflength60 <- n-nmiss60
+information[[j]] <- paste0(country[cc],";",
+stationame[ss],";",
+"OK",";",
+data00[1,1],";",
+data00[n,1],";",
+n,";",
+nmiss,";",
+n60,";",
+nmiss60,";",
+efflength60)}
+j <- j+1
+}
+}
+n <- length(information)
+inf <- NULL
+for (i in 1:n){
+p <- unlist(strsplit(information[[i]],split=";"))
+inf <- rbind(inf,p)}
+TSinformation <- as.data.frame(inf)
+colnames(TSinformation) <- c("Country","Station","Status","From",
+"To","Length","Missing",
+"Length60","Missing60","EffectiveLength60")
+View(TSinformation)
+n <- length(information)
+inf <- NULL
+for (i in 1:n){
+p <- unlist(strsplit(information[[i]],split=";"))
+inf <- rbind(inf,p)}
+TSinformation <- as.data.frame(inf)
+colnames(TSinformation) <- c("Country","Station","Status","From",
+"To","Length","Missing",
+"Length60","Missing60","EffectiveLength60")
+write.csv(TSinformation,
+"C:\\Users\\x230\\Google Drive\\Temperature\\Script\\TSinformation.csv")
+write.csv(TSinformation,
+"C:\\Users\\x230\\Google Drive\\Temperature\\Tables\\
+TS1 - Row data information.csv")
+write.csv(TSinformation,
+"C:\\Users\\x230\\Google Drive\\Temperature\\Tables\\TS1 - Row data information.csv")
+TS1information <- as.data.frame(inf)
+colnames(TS1information) <- c("Country","Station","Status","From",
+"To","Length","Missing",
+"Length60","Missing60","EffectiveLength60")
+head(TS1information)
+directory <- "C:\\Users\\x230\\Google Drive\\Temperature\\Data\\Raw data"
+setwd(directory)
+country <- dir()
+ncc <- length(country)
+cc <- 1
+j <- 1
+information <- list()
+for (cc in 1:ncc){
+subdir <- paste(directory,"\\",country[cc],sep="")
+setwd(subdir)
+station0 <- dir()
+station <- station0[grep(".txt",station0)]
+# To distinguish data files from other types of files
+stationame <- sub(".txt","",station)
+nss <- length(station)
+for (ss in 1:nss){
+data00 <- read.delim(station[ss],header=F,na.strings=99)
+n <- dim(data00)[[1]]
+if (is.numeric(data00[,1])==FALSE|dim(data00)[[2]]!=14)
+information[[j]] <- paste0(country[cc],";",
+stationame[ss],";
+ERROR;
+NA;NA;NA;NA;NA;NA;NA")
+else {
+nmiss <- sum(is.na(data00[,14]))
+data60 <- data00[which(data00[,1]<=1960),]
+n60 <- dim(data60)[[1]]
+nmiss60 <- sum(is.na(data60[,14]))
+efflength60 <- n60-nmiss60
+information[[j]] <- paste0(country[cc],";",
+stationame[ss],";",
+"OK",";",
+data00[1,1],";",
+data00[n,1],";",
+n,";",
+nmiss,";",
+n60,";",
+nmiss60,";",
+efflength60)}
+j <- j+1
+}
+}
+#--- GLOBAL TIME SERIES INFORMATION MATRIX
+n <- length(information)
+inf <- NULL
+for (i in 1:n){
+p <- unlist(strsplit(information[[i]],split=";"))
+inf <- rbind(inf,p)}
+TS1information <- as.data.frame(inf)
+colnames(TS1information) <- c("Country","Station","Status","From",
+"To","Length","Missing",
+"Length60","Missing60","EffectiveLength60")
+write.csv(TS1information,
+"C:\\Users\\x230\\Google Drive\\Temperature\\Tables\\TS1 - Row data information.csv")
+head(TS1information)
+TS2accepted <- TS1information[which(TSinformation$Status=="OK"),]
+acceptance.rate <- dim(TS1information)/dim(TS2accepted)*100
+acceptance.rate <- dim(TS1information)[[1]]/dim(TS2accepted)[[1]]*100
+acceptance.rate
+acceptance.rate <- dim(TS2accepted)[[1]]/dim(TS1information)[[1]]*100
+acceptance.rate <- round(dim(TS2accepted)[[1]]/dim(TS1information)[[1]]*100,2)
+accepted <- dim(TS2accepted)[[1]]; global <- dim(TS1information)
+accepted <- dim(TS2accepted)[[1]]; global <- dim(TS1information)
+paste(accepted "accepted time series over" global "\n From step 1 to step 2
+the acceptance rate is" round(accepted/global*100,2))
+paste(accepted,"accepted time series over",global "\n From step 1 to step 2
+the acceptance rate is" round(accepted/global*100,2))
+paste(accepted,"accepted time series over",global " From step 1 to step 2
+the acceptance rate is", round(accepted/global*100,2))
+paste(accepted,"accepted time series over",global, " From step 1 to step 2
+the acceptance rate is", round(accepted/global*100,2))
+paste("Cleaning data - Step 1 to step 2:",
+accepted, "accepted time series over",global,
+"/n The acceptance rate is", round(accepted/global*100,2))
+paste("Cleaning data - Step 1 to step 2:",
+accepted, "accepted time series over",global,
+"\t The acceptance rate is", round(accepted/global*100,2))
+global <- dim(TS1information)[[1]]
+?paste
+paste("Cleaning data - Step 1 to step 2:",
+accepted, "accepted time series over",global,
+"The acceptance rate is", round(accepted/global*100,2))
+View(TS2accepted)
+View(TS2accepted)
+EffLen60 <- as.numeric(TS2accepted$EffectiveLenght60)
+effLen60 <- as.numeric(TS2accepted$EffectiveLenght60)
+TS2accepted$EffectiveLenght60
+TS2accepted
+effLen60 <- as.numeric(TS2accepted$EffectiveLength60)
+effLen60
+barplot(effLen60)
+hist(effLen60)
+RealLength <- as.numeric(TS2accepted$EffectiveLength60)
+count <- rev(table(RealLength))
+table(RealLength)
+?
+rev
+count
+sumcount <- cumsum(count)
+plot(names(sumcount),sumcount,type="h",col=4,lwd=2,
+main="Time series selection number",xlab="Number of years",
+ylab="Number of available time series")
+RealLength <- as.numeric(TS2accepted$EffectiveLength60)
+count <- rev(table(RealLength))
+sumcount <- cumsum(count)
+plot(names(sumcount),sumcount,type="h",col=4,lwd=2,
+main="Time series selection number",xlab="Number of years",
+ylab="Number of available time series")
+sumcount
+sumcount2 <- sumcount[30:50]
+plot(names(sumcount2),sumcount2,type="h",col=4,lwd=4,
+main="Time series selection number",xlab="Number of years",
+ylab="Number of available time series",ylim=c(0,230))
+text(names(sumcount2),sumcount2+10,sumcount2,cex=0.7,col=4)
+sumcount2 <- sumcount[30:50]
+plot(names(sumcount2),sumcount2,type="h",col=4,lwd=4,
+main="Time series selection number",xlab="Number of years",
+ylab="Number of available time series",
+text(names(sumcount2),sumcount2+10,sumcount2,cex=0.7,col=4)
+sumcount2 <- sumcount[30:50]
+plot(names(sumcount2),sumcount2,type="h",col=4,lwd=4,
+main="Time series selection number",xlab="Number of years",
+ylab="Number of available time series")
+text(names(sumcount2),sumcount2+10,sumcount2,cex=0.7,col=4)
+directory <- "C:\\Users\\x230\\Google Drive\\Temperature\\Data\\Raw data"
+setwd(directory)
+country <- dir()
+ncc <- length(country)
+# LIST OF INFORMATION
+cc <- 1
+j <- 1
+information <- list()
+for (cc in 1:ncc){
+subdir <- paste(directory,"\\",country[cc],sep="")
+setwd(subdir)
+station0 <- dir()
+station <- station0[grep(".txt",station0)]
+# To distinguish data files from other types of files
+stationame <- sub(".txt","",station)
+nss <- length(station)
+for (ss in 1:nss){
+data00 <- read.delim(station[ss],header=F,na.strings=99)
+n <- dim(data00)[[1]]
+if (is.numeric(data00[,1])==FALSE|dim(data00)[[2]]!=14)
+information[[j]] <- paste0(country[cc],";",
+stationame[ss],";
+ERROR;
+NA;NA;NA;NA;NA;NA;NA")
+else {
+nmiss <- sum(is.na(data00[,14]))
+data60 <- data00[which(data00[,1]<=1960),]
+n60 <- dim(data60)[[1]]
+nmiss60 <- sum(is.na(data60[,14]))
+efflength60 <- n60-nmiss60
+information[[j]] <- paste0(country[cc],";",
+stationame[ss],";",
+"OK",";",
+data00[1,1],";",
+data00[n,1],";",
+n,";",
+nmiss,";",
+n60,";",
+nmiss60,";",
+efflength60)}
+j <- j+1
+}
+}
+# Ignore the warnings!
+# CONVERSION TO A MATRIX
+n <- length(information)
+inf <- NULL
+for (i in 1:n){
+p <- unlist(strsplit(information[[i]],split=";"))
+inf <- rbind(inf,p)}
+TS1information <- as.data.frame(inf)
+colnames(TS1information) <- c("Country","Station","Status","From",
+"To","Length","Missing",
+"Length60","Missing60","EffectiveLength60")
+# WRITING OF THE TABLE
+write.csv(TS1information,
+"C:\\Users\\x230\\Google Drive\\Temperature\\Tables\\TS1 - Row data information.csv")
+# VISUALIZATION
+head(TS1information)
+#--- STEP 2 - SELECTION OF VALIDELY STRUCTURED TIME SERIES
+TS2accepted <- TS1information[which(TSinformation$Status=="OK"),]
+# Acceptance rate
+accepted <- dim(TS2accepted)[[1]]; global <- dim(TS1information)[[1]]
+paste("Cleaning data - Step 1 to step 2:",
+accepted, "accepted time series over",global,
+"The acceptance rate is", round(accepted/global*100,2))
+#--- STEP 3 - SELECTION OF TIME SERIES WITH HIGH LENGHT AFTER 1960
+RealLength <- as.numeric(TS2accepted$EffectiveLength60)
+count <- rev(table(RealLength))
+sumcount <- cumsum(count)
+plot(names(sumcount),sumcount,type="h",col=4,lwd=2,
+main="Time series selection number",
+xlab="Number of recorded years",
+ylab="Number of available time series")
+sumcount2 <- sumcount[30:50]
+plot(names(sumcount2),sumcount2,type="h",col=4,lwd=4,
+main="Time series selection number",xlab="Number of years",
+ylab="Number of available time series")
+text(names(sumcount2),sumcount2+10,sumcount2,cex=0.7,col=4)
+plot(names(sumcount),sumcount,type="h",col=4,lwd=2,
+main="Time series selection number",
+xlab="Number of recorded years",
+ylab="Number of available time series")
+sumcount2 <- sumcount[30:50]
+plot(names(sumcount2),sumcount2,type="h",col=4,lwd=4,
+main="Time series selection number",xlab="Number of years",
+ylab="Number of available time series")
+text(names(sumcount2),sumcount2+10,sumcount2,cex=0.7,col=4)
+count
+plot(names(sumcount),sumcount,type="h",col=4,lwd=2,
+main="Time series selection number",
+xlab="Number of recorded years",
+ylab="Number of available time series")
+View(TS1information)

@@ -1,0 +1,10 @@
+;Country;Station;Dir;Lon;Lat
+16;Germany;Berlin;Germany\Berlin.txt;13,404954;52,5200066
+65;Switzerland;Geneva;Switzerland\Geneva.txt;6,1422961;46,1983922
+64;Switzerland;Basel;Switzerland\Basel.txt;7,5975507;47,5674422
+15;France;Paris;France\Paris.txt;2,3522219;48,856614
+61;Sweden;Stockholm;Sweden\Stockholm.txt;18,0685808;59,3293235
+33;Italy;Milan;Italy\Milan.txt;9,1859243;45,4654219
+10;Czech Republic;Prague;Czech Republic\Prague.txt;14,4378005;50,0755381
+22;Hungary;Budapest;Hungary\Budapest.txt;19,040235;47,497912
+11;Denmark;Copenhagen;Denmark\Copenhagen.txt;12,5683371;55,6760968

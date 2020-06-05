@@ -1,0 +1,118 @@
+---
+title: "Online Resource 01 - Supplementary appendix E"
+author: "John Dagsvik, Mariachiara Fortuna, Sigmund H. Moen"
+subtitle: "How does the temperature vary over time? Evidence on the Stationary and Fractal nature of Temperature Fluctuations"
+output:
+  pdf_document: default
+
+---
+
+
+\vspace{8.5cm}
+
+**Affiliations:** 
+
+John K. Dagsvik, Statistics Norway, Research Department; 
+
+Mariachiara Fortuna, freelance statistician, Turin; 
+
+Sigmund Hov Moen, Westerdals Oslo School of Arts, Communication and Technology. 
+
+
+\vspace{0.5cm}
+
+**Corresponding author:**
+
+John K. Dagsvik, E-mail: john.dagsvik@ssb.no
+
+Mariachiara Fortuna, E-mail: mariachiara.fortuna1@gmail.com (reference for code and analysis)
+
+
+\newpage
+
+
+```{r global options, echo=F}
+knitr::opts_chunk$set(
+  echo = F, # Set to TRUE for pdf with code
+  message=FALSE,
+  warning = FALSE)
+longrun <- FALSE
+```
+
+
+
+```{r loading libraries, warning = F, message = F}
+require(tempFGN)
+require(tidyverse)
+require(tidyr)
+require(lubridate)
+library(maps)
+```
+
+
+```{r path building, hide=T}
+# DATA PATH
+data_final_path <- file.path("data","final")
+data_supporting_path <- file.path("data", "supporting")
+data_moberg_path <- file.path("data", "moberg")
+
+# OUTPUT PATH
+output_supporting_path <- file.path("output", "supporting")
+output_table_path <- file.path("output", "table")
+output_figure_path <- file.path("output", "figure")
+output_temporary_path <- file.path("output", "temporary")
+output_manipuated_path <- file.path("output", "manipulated")
+```
+
+
+```{r data reading}
+
+# ACCESS TO ALL THE TIME SERIES
+all <- read.csv(file.path(data_supporting_path, "T0.TempInfo.csv"), sep=";", dec=",")
+country_all <- all$Country
+station_all <- all$Station
+nja <- nrow(all)
+data_dir_all <- file.path(data_final_path, country_all, paste0(station_all, ".txt"))
+stationame_all <- paste0(country_all,", ",station_all)
+
+```
+  
+
+
+
+```{r FE1 - Final appendix sheet, fig.height=9}
+
+for (j in 1:nja){ 
+  
+  data <- read.delim(data_dir_all[j], header=F, na.strings=99)
+  dataM <- monthlyAdj(data, scale=T)
+  Zm <- dataM$Zm 
+  Ym <- cumsum(Zm)
+  
+  par(oma=c(0, 0, 2, 0))
+  
+  par(fig=c(0, 0.5, 0.66, 0.96), cex=0.6)
+  maps::map('world', ylim=c(-60,90), mar=c(2,2,2,2))
+  points(all$Lon[j], all$Lat[j], col=2, pch=16, cex=2)
+  
+  par(fig=c(0.5, 1, 0.62, 0.98), cex=0.6, 
+      bty="l", mar=c(6,4,5,2), new=T)
+  autocorrPlot(Zm, H="cfH", 
+               cex.axis=1, cex.lab=1, cex.main=1.1, cex.dots=1.2)$plot
+  
+  par(fig=c(0, 1, 0.33, 0.63), mar=c(3,4,5,2), bty="l", cex=0.7, new=T)
+  blueRedPlot(Time=dataM$Time, Zj= Zm, break.val=1960, ic=NULL)
+  
+  par(fig=c(0,0.5,0,0.33), cex=0.7, new=T)
+  fgtSelfSim(Yj=Ym)$plot
+  
+  par(fig=c(0.5,1,0,0.33), cex=0.7, new=T)
+  fgtNormality(Yj=Ym)$plot
+  
+  title(stationame_all[j], outer=T, cex.main=1.5)
+}
+
+```
+
+
+

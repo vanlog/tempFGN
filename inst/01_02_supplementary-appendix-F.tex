@@ -1,0 +1,502 @@
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provides euro and other symbols
+\else % if luatex or xelatex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\usepackage{hyperref}
+\hypersetup{
+            pdftitle={Online Resource 01 - Supplementary appendix F Selection process and data description},
+            pdfauthor={John Dagsvik, Mariachiara Fortuna, Sigmund H. Moen},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable,booktabs}
+% Fix footnotes in tables (requires footnote package)
+\IfFileExists{footnote.sty}{\usepackage{footnote}\makesavenoteenv{longtable}}{}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+
+\title{Online Resource 01 - Supplementary appendix F Selection process and data
+description}
+\providecommand{\subtitle}[1]{}
+\subtitle{How does the temperature vary over time? Evidence on the Stationary and
+Fractal nature of Temperature Fluctuations}
+\author{John Dagsvik, Mariachiara Fortuna, Sigmund H. Moen}
+\date{}
+
+\begin{document}
+\maketitle
+
+\vspace{8.5cm}
+
+\textbf{Affiliations:}
+
+John K. Dagsvik, Statistics Norway, Research Department;
+
+Mariachiara Fortuna, freelance statistician, Turin;
+
+Sigmund Hov Moen, Westerdals Oslo School of Arts, Communication and
+Technology.
+
+\vspace{0.5cm}
+
+\textbf{Corresponding author:}
+
+John K. Dagsvik, E-mail:
+\href{mailto:john.dagsvik@ssb.no}{\nolinkurl{john.dagsvik@ssb.no}}
+
+Mariachiara Fortuna, E-mail:
+\href{mailto:mariachiara.fortuna1@gmail.com}{\nolinkurl{mariachiara.fortuna1@gmail.com}}
+(reference for code and analysis)
+
+\newpage
+
+\newpage
+
+\hypertarget{raw-data-exploration}{%
+\section{RAW DATA EXPLORATION}\label{raw-data-exploration}}
+
+\hypertarget{raw-data-organization}{%
+\subsection{Raw data organization}\label{raw-data-organization}}
+
+The data used in this project were collected by \textbf{Sigmund Hov
+Moen}, and are available in the \textbf{Rimfrost system},
+\href{http://www.rimfrost.no/}{www.rimfrost.no}.
+
+They consist of a large amount of monthly and annual temperature time
+series from all around the world.
+
+The raw data, as organized in the Rimfrost system, are collected in the
+folder ``data/raw''.
+
+The ``data/raw'' folder contains 101 subfolders named with the English
+or the Norwegian name of the countries included in the Rimfrost system.
+
+Each country folder contains the temperature time series for each
+weather station included in the Rimfrost system.
+
+\hypertarget{data-structure}{%
+\subsection{Data structure}\label{data-structure}}
+
+Each time series is collected in a separate txt file, usually named with
+the Norwegian name of the weather station.
+
+Each file is structured as follow:
+
+\begin{itemize}
+\item
+  Column 1: \textbf{Year}
+\item
+  Columns 2-13: \textbf{Monthly temperatures} in that year, from January
+  to December
+\item
+  Column 14: \textbf{Average annual temperature}, measured as mean of
+  the monthly temperarures for that year
+\end{itemize}
+
+There are no column names, and the missing data are usually recorded
+with the string \emph{99} (but several exceptions are present).
+
+As an example, these are the first six rows of the \emph{Paris.txt}
+file.
+
+\begin{longtable}[]{@{}rrrrrrrrrrrrrr@{}}
+\toprule
+V1 & V2 & V3 & V4 & V5 & V6 & V7 & V8 & V9 & V10 & V11 & V12 & V13 &
+V14\tabularnewline
+\midrule
+\endhead
+1757 & -0.33 & 3.73 & 6.03 & 11.23 & 14.53 & 19.03 & 24.63 & 19.63 &
+16.23 & 8.23 & 9.03 & 0.43 & 11.0\tabularnewline
+1758 & 1.63 & 3.93 & 7.93 & 10.03 & 18.53 & 20.33 & 17.93 & 20.83 &
+15.43 & 9.83 & 5.63 & 3.13 & 11.3\tabularnewline
+1759 & 4.53 & 6.03 & 7.33 & 11.73 & 15.33 & 19.43 & 23.93 & 20.43 &
+17.73 & 12.63 & 3.73 & 3.13 & 12.2\tabularnewline
+1760 & 0.23 & 3.63 & 6.63 & 12.33 & 16.03 & 20.03 & 21.63 & 19.73 &
+18.73 & 11.83 & 7.53 & 1.43 & 11.6\tabularnewline
+1761 & 1.83 & 6.33 & 8.73 & 10.83 & 16.33 & 19.53 & 21.43 & 21.93 &
+18.33 & 10.43 & 5.63 & 6.43 & 12.3\tabularnewline
+1762 & 4.93 & 4.03 & 4.03 & 13.83 & 17.33 & 19.93 & 23.33 & 19.63 &
+16.83 & 9.83 & 5.83 & 2.63 & 11.8\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{main-features-of-the-raw-data}{%
+\subsection{Main features of the raw
+data}\label{main-features-of-the-raw-data}}
+
+In order to select the set of suitable time series and explore their
+main features, we first provide a preliminary table with useful
+information (\emph{T0\_Information}). This table contains general
+information about all the available time series, namely:
+
+\begin{itemize}
+\item
+  \textbf{Country} and \textbf{Station} name for each time series
+\item
+  Its \textbf{Status}. The Status variable provides the results of some
+  validation checks about the data format. ``OK'' means that the time
+  series passed the checks, ``ERROR'' means that it did not pass the
+  checks (eg the file has a wrong number of columns)
+\item
+  \textbf{From} and \textbf{To} show the first and the last year of the
+  recorded time series
+\item
+  \textbf{Length} shows the length in years of the time series
+\item
+  \textbf{Missing} shows the number of missing annual average
+  temperature. NA means \emph{Not Available}
+\end{itemize}
+
+As an example, consider the first 6 rows of the \emph{T0\_Information}
+table:
+
+\begin{longtable}[]{@{}lllrrrr@{}}
+\toprule
+Country & Station & Status & From & To & Length & Missing\tabularnewline
+\midrule
+\endhead
+afganistan & herat & OK & 1963 & 1990 & 28 & 16\tabularnewline
+afganistan & kabul & OK & 1961 & 1992 & 32 & 12\tabularnewline
+afganistan & mazar\_i\_sharif & OK & 1964 & 1992 & 29 &
+11\tabularnewline
+algerie & adrar & OK & 1965 & 2011 & 47 & 4\tabularnewline
+algerie & alger\_dar\_elbeida & OK & 1923 & 2011 & 89 & 3\tabularnewline
+algerie & beni\_abbes & OK & 1931 & 2011 & 81 & 25\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{raw-data-basic-exploration}{%
+\subsection{Raw data basic
+exploration}\label{raw-data-basic-exploration}}
+
+The total number of availbale time series is \textbf{1260}.
+
+The table below provides a summary of the information given about each
+recorded variable:
+
+\begin{longtable}[]{@{}lccccc@{}}
+\toprule
+& Status & From & To & Length & Missing\tabularnewline
+\midrule
+\endhead
+& ERROR: 225 & Min. :1701 & Min. :1869 & Min. : 5.00 & Min. :
+0.00\tabularnewline
+& OK :1035 & 1st Qu.:1890 & 1st Qu.:2009 & 1st Qu.: 61.00 & 1st Qu.:
+1.00\tabularnewline
+& NA & Median :1925 & Median :2011 & Median : 84.00 & Median :
+2.00\tabularnewline
+& NA & Mean :1917 & Mean :2008 & Mean : 92.28 & Mean :
+5.57\tabularnewline
+& NA & 3rd Qu.:1949 & 3rd Qu.:2012 & 3rd Qu.:122.00 & 3rd Qu.:
+6.00\tabularnewline
+& NA & Max. :2002 & Max. :2012 & Max. :312.00 & Max.
+:104.00\tabularnewline
+& NA & NA's :225 & NA's :228 & NA's :225 & NA's :225\tabularnewline
+\bottomrule
+\end{longtable}
+
+The following graph shows all the available time series, sorted by first
+recorded year. The green dot represents the first recorded year, while
+the purple dot represents the last recorded year. The grey segment
+represents the length of the time series.
+
+\begin{figure}[h]
+
+{\centering \includegraphics{01_02_supplementary-appendix-F_files/figure-latex/ts-lollipop-1} 
+
+}
+
+\caption{\label{fig:ts-lollipop} Time series plot}\label{fig:ts-lollipop}
+\end{figure}
+
+\newpage
+
+\hypertarget{selection-process}{%
+\section{SELECTION PROCESS}\label{selection-process}}
+
+Given the wide variety of properties of the available time series, we
+decided to apply a multi-step automatic selection procedure to obtain a
+subset of series with specific characteristics.
+
+In any case, the full set of available time series (1260) is contained
+in the data/raw folder, and can be analyzed with the provided code.
+
+\hypertarget{multi-step-automatic-process}{%
+\subsection{Multi-step automatic
+process}\label{multi-step-automatic-process}}
+
+Briefly, the multi-step process was designed as follow:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Step 1 - Valid structure}: selection of the time series with
+  valid data structure
+\item
+  \textbf{Step 2 - Length in years}: selection of the time series with
+  more than 105 recorded years
+\item
+  \textbf{Step 3 - Recorded months}: selection of the time series with
+  more than 1280 recorded months (non missing)
+\item
+  \textbf{Step 4 - Missing months}: selection of the time series with
+  less than 80 missing months
+\item
+  \textbf{Step 5 - Length in months}: selection of the time series with
+  full monthly length not inferior to 1290 months
+\end{enumerate}
+
+\hypertarget{step-1---selection-by-valid-structure}{%
+\subsubsection{Step 1 - Selection by valid
+structure}\label{step-1---selection-by-valid-structure}}
+
+Using the information table previusly built (\emph{T0\_Information}), we
+selected all the time series with the variable \emph{Status} equal to
+\emph{OK}.
+
+Here the results of the selection procedure for valid structure (step
+1):
+
+\begin{verbatim}
+##  Cleaning data - Step : 1 
+##  ************************************ 
+##  1035 accepted time series over 1260 
+##  Current step acceptance rate : 82.14 % 
+##  Loss from step 1: 17.86 %
+\end{verbatim}
+
+\hypertarget{step-2---selection-by-length-years}{%
+\subsubsection{Step 2 - Selection by length
+(years)}\label{step-2---selection-by-length-years}}
+
+The second step of our selection procedure was to identify all the time
+series that had more than 106 recorded years.
+
+The results of the second step of the selection procedure follows here:
+
+\begin{verbatim}
+##  Cleaning data - Step : 2 
+##  ************************************ 
+##  376 accepted time series over 1035 
+##  Current step acceptance rate : 36.33 % 
+##  Loss from step 1: 70.16 %
+\end{verbatim}
+
+At this point, our subset consists of 376 weather stations.
+
+\hypertarget{information-table-2---monthly-information}{%
+\subsubsection{Information table 2 - Monthly
+information}\label{information-table-2---monthly-information}}
+
+In order to apply step 3-5 of the selection procedure, we need to gather
+information about the data at a monthly level.
+
+We then built a second information table, with the following fields:
+
+\begin{itemize}
+\item
+  \textbf{Country} and \textbf{Station} name for each time series
+\item
+  \textbf{First\_Year} and \textbf{First\_Year}, first and the last year
+  of the recorded time series
+\item
+  \textbf{Years}, length in years of the time series
+\item
+  \textbf{Months}, number of available months (non missing)
+\item
+  \textbf{Full\_Length}, number of months between the first recorded
+  month and the last one.
+\item
+  \textbf{Missing\_M}, number of missing months
+\end{itemize}
+
+\begin{verbatim}
+## Error in colMeans(x, na.rm = TRUE) : 'x' must be numeric
+## Error in colMeans(x, na.rm = TRUE) : 'x' must be numeric
+\end{verbatim}
+
+As an example, consider the the first 10 rows of the
+\emph{T02\_Information2} table:
+
+\begin{longtable}[]{@{}llrrrrrr@{}}
+\toprule
+Country & Station & First\_Year & Last\_Year & Years & Months &
+Full\_Lenght & Missing\_M\tabularnewline
+\midrule
+\endhead
+alpene & geneve\_ecad & 1901 & 2009 & 109 & 1303 & 1314 &
+11\tabularnewline
+alpene & graz & 1894 & 2009 & 116 & 1387 & 1398 & 11\tabularnewline
+alpene & hohenpeissenberg & 1781 & 2009 & 229 & 2741 & 2754 &
+13\tabularnewline
+alpene & innsbruck & 1877 & 2009 & 133 & 1490 & 1597 &
+107\tabularnewline
+alpene & klagenfurt & 1881 & 2009 & 129 & 1513 & 1554 &
+41\tabularnewline
+alpene & kremsmunster & 1876 & 2009 & 134 & 1602 & 1614 &
+12\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{step-3---selection-by-available-months}{%
+\subsubsection{Step 3 - Selection by available
+months}\label{step-3---selection-by-available-months}}
+
+We can now refine the selection procedure checking that the number of
+\emph{non missing months} is superior to \emph{1260}.
+
+Here the results of this selection step:
+
+\begin{verbatim}
+##  Cleaning data - Step : 3 
+##  ************************************ 
+##  329 accepted time series over 376 
+##  Current step acceptance rate : 87.5 % 
+##  Loss from step 1: 73.89 %
+\end{verbatim}
+
+\hypertarget{step-4---selection-by-missing-months}{%
+\subsubsection{Step 4 - Selection by missing
+months}\label{step-4---selection-by-missing-months}}
+
+We can now exclude all the time series with number of \emph{missing
+months} above \emph{80}.
+
+Recall that the previous step was about non missing months: in this step
+we are avoiding time series that (although long), contain so many
+``holes'' that they might compromise the data quality.
+
+Here the results of this selection step:
+
+\begin{verbatim}
+##  Cleaning data - Step : 3 
+##  ************************************ 
+##  278 accepted time series over 329 
+##  Current step acceptance rate : 84.5 % 
+##  Loss from step 1: 77.94 %
+\end{verbatim}
+
+\hypertarget{step-5---length-in-months}{%
+\subsubsection{Step 5 - Length in
+months}\label{step-5---length-in-months}}
+
+The last step of the selection procedure is to check if the total length
+of the time series (from the first recorded month to the last one,
+missing included) is not inferior to 1290.
+
+Above the results:
+
+\begin{verbatim}
+##  Cleaning data - Step : 5 
+##  ************************************ 
+##  277 accepted time series over 278 
+##  Current step acceptance rate : 99.64 % 
+##  Loss from step 1: 78.02 %
+\end{verbatim}
+
+At this point we have a subset of 277 waether stations, characterized by
+a valid data structure and a length and presence of missing observation
+below specific thresholds.
+
+\hypertarget{final-selection}{%
+\subsection{Final selection}\label{final-selection}}
+
+In order to select the final set of weather stations we proceded by
+manual inspection of all the time series.
+
+We excluded all the time series with substantial quality problems, such
+as those with extreme outliers and several consecutive missing over time
+intervals.
+
+In the final selection we tried as much as possible to select weather
+stations that were distributed across most parts of the world.
+
+\hypertarget{consecutive-missing-data-example---cita}{%
+\subsubsection{Consecutive missing data example -
+Cita}\label{consecutive-missing-data-example---cita}}
+
+\begin{center}\includegraphics{01_02_supplementary-appendix-F_files/figure-latex/cita data -1} \end{center}
+
+\hypertarget{outliers-example---vilnius}{%
+\subsubsection{Outliers example -
+Vilnius}\label{outliers-example---vilnius}}
+
+\begin{center}\includegraphics{01_02_supplementary-appendix-F_files/figure-latex/vilnius data-1} \end{center}
+
+\hypertarget{final-data}{%
+\subsubsection{Final data}\label{final-data}}
+
+Summary statistics of the selected of 96 time series is shown in
+Appendix B, table B1.
+
+There are two time series that did not pass the tests but we still
+included them in our analysis. One is from Ivittuut, Greenland, and the
+second one is from Uppsala, Sweden. The reason is that Greenland is of
+particular interest in the climate debate, and the temperature series
+from Uppsala is the longest time series ever recorded.
+
+All the selected time series are available in the data/final folder. All
+the names (country and stations) have been translated to English.
+
+We have highlighted results from 9 weather stations because they are
+well known cities with good quality of the temperature data.
+
+\end{document}
